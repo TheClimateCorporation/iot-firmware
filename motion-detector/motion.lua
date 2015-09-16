@@ -6,7 +6,7 @@ local URI = "/iot/v1/rosie/motion"
 local device_id = node.chipid()
 
 function debug(message)
-    print("[DEBUG] " .. message)
+    print("[DEBUG - " .. tmr.time() .. "] " .. message)
 end
 
 function build_request(d, start)
