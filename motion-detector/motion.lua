@@ -6,11 +6,11 @@ local URI = "/iot/v1/rosie/motion"
 local device_id = node.chipid()
 
 function debug(message)
-    print("[DEBUG - " .. tmr.time() .. "] " .. message)
+    print("[DEBUG - " .. timestamp .. "] " .. message)
 end
 
 function build_request(d, start)
-    local duration_since_start = tmr.time() - start
+    local duration_since_start = timestamp - start
     debug("duration since start " .. duration_since_start)
     local body = '{"duration-s": ' .. d .. ', "duration-since-start-s": ' .. duration_since_start ..
             ', "device-id": "' .. device_id .. '"}'
@@ -62,7 +62,7 @@ function motion_start()
         debug("stopwatch already started")
     else
         stopwatch.started = true
-        stopwatch.start = tmr.time()
+        stopwatch.start = timestamp
         debug("Motion detected!")
         debug("start: " .. stopwatch.start)
         gpio.trig(inpin, "down", motion_stop)
@@ -73,7 +73,7 @@ function motion_stop()
     if not stopwatch.started then
         debug("stopwatch already stopped")
     else
-        local last_end = tmr.time()
+        local last_end = timestamp
         local last_start = stopwatch.start
         local duration = last_end - last_start
         debug("motion started " .. last_start .. " ended " .. last_end .. " after " .. duration .. " seconds.")
@@ -87,8 +87,11 @@ function motion_stop()
     end
 end
 
+timestamp = 0
+tmr.alarm(1, 1000, 1, function() timestamp = timestamp + 1 end)
+
 stopwatch = {}
 stopwatch.started = false
-stopwatch.start = tmr.time()
+stopwatch.start = timestamp
 
 gpio.trig(inpin, "up", motion_start)
